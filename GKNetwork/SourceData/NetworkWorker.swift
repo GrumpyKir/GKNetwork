@@ -10,7 +10,11 @@ import GKExtensions
 
 public class NetworkWorker {
     
-    private var activeTasks: [String: URLSessionDataTask] = [:]
+    private var activeTasks: [String: URLSessionDataTask]
+    
+    public init() {
+        self.activeTasks = [:]
+    }
     
     public func execute<T: Codable>(_ request: URLRequest, completion: @escaping (_ result: T?, _ response: URLResponse?, _ error: Error?) -> Void) {
         guard let taskAbsoluteString: String = request.url?.absoluteString else {
