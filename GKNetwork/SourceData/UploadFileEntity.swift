@@ -12,7 +12,7 @@ public struct UploadFileEntity {
     var filename: String
     var data: Data
     
-    init(filename: String, data: Data) {
+    public init(filename: String, data: Data) {
         self.filename = filename
         self.data = data
     }
