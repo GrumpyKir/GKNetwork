@@ -96,7 +96,7 @@ public enum URLRequestFactory {
         return request
     }
     
-    private static func createRequestWithBodyParameters(path: String, parameters: [String: Any?]?, headers: [String: String]?, method: String) -> URLRequest? {
+    private static func createRequestWithBodyParameters(path: String, parameters: [String: Any]?, headers: [String: String]?, method: String) -> URLRequest? {
         let urlString = path
         guard let url = URL(string: urlString) else { return nil }
         
@@ -120,7 +120,7 @@ public enum URLRequestFactory {
         return request
     }
     
-    private static func createRequestWithBodyUrlEncodingParameters(path: String, parameters: [String: Any?]?, headers: [String: String]?, method: String) -> URLRequest? {
+    private static func createRequestWithBodyUrlEncodingParameters(path: String, parameters: [String: Any]?, headers: [String: String]?, method: String) -> URLRequest? {
         let urlString = path
         guard let url = URL(string: urlString) else { return nil }
         
