@@ -75,7 +75,7 @@ public enum URLRequestFactory {
     private static func createRequestWithUrlParameters(path: String, parameters: [String: Any]?, headers: [String: String]?, method: String) -> URLRequest? {
         var parameterString = ""
         if let parameters = parameters {
-            parameterString = parameters.stringFromHttpParameters()
+            parameterString = generateParametersString(parameters)
         }
         
         var urlString = path
@@ -128,7 +128,7 @@ public enum URLRequestFactory {
         request.httpMethod = method
         
         if let parameters = parameters {
-            request.httpBody = parameters.stringFromHttpParameters().data(using: .utf8)
+            request.httpBody = generateParametersString(parameters).data(using: .utf8)
         }
         
         if let headers = headers {
@@ -169,6 +169,43 @@ public enum URLRequestFactory {
     
     private static func generateBoundaryString() -> String {
         return "Boundary-\(NSUUID().uuidString)"
+    }
+    
+    private static func generateParametersString(_ parameters: [String: Any]) -> String {
+        let parameterArray = parameters.map { key, value -> String in
+            guard let escapedKey = key.addingPercentEncodingForUrlQueryValue() else { return "" }
+            
+            if let stringValue = value as? String {
+                guard let escapedValue = stringValue.addingPercentEncodingForUrlQueryValue() else { return "" }
+                
+                return "\(escapedKey)=\(escapedValue)"
+            }
+            
+            if let arrayValue = value as? [Any] {
+                var arrayParameter: [String] = []
+                
+                for index in 0..<arrayValue.count {
+                    var element: String
+                    if let stringElement = arrayValue[index] as? String {
+                        element = stringElement
+                    } else {
+                        element = "\(arrayValue[index])"
+                    }
+                    
+                    guard let escapedElement = element.addingPercentEncodingForUrlQueryValue() else { continue }
+                    
+                    arrayParameter.append("\(escapedKey)[]=\(escapedElement)")
+                }
+                
+                return arrayParameter.joined(separator: "&")
+            }
+            
+            guard let escapedValue = "\(value)".addingPercentEncodingForUrlQueryValue() else { return "" }
+            
+            return "\(escapedKey)=\(escapedValue)"
+        }
+        
+        return parameterArray.joined(separator: "&")
     }
     
 }
