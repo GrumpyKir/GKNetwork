@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		3AEB079B67BE08253E8A6481 /* Pods_GKNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FA158919E0F3970586AEEDD /* Pods_GKNetwork.framework */; };
 		ED29AE732211BA020035C17A /* GKNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = ED29AE712211BA020035C17A /* GKNetwork.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		ED29AE7E2211BA470035C17A /* UploadFileEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED29AE7B2211BA460035C17A /* UploadFileEntity.swift */; };
-		ED29AE7F2211BA470035C17A /* URLRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED29AE7C2211BA460035C17A /* URLRequestFactory.swift */; };
-		ED29AE802211BA470035C17A /* NetworkWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED29AE7D2211BA470035C17A /* NetworkWorker.swift */; };
+		ED2E8A0F226090CD00E44849 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2E8A0E226090CD00E44849 /* HTTPMethod.swift */; };
+		ED2E8A112260912400E44849 /* RemoteFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2E8A102260912400E44849 /* RemoteFactory.swift */; };
+		ED2E8A132260914800E44849 /* RemoteUploadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2E8A122260914800E44849 /* RemoteUploadModel.swift */; };
+		ED2E8A152260916F00E44849 /* RemoteMappable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2E8A142260916F00E44849 /* RemoteMappable.swift */; };
+		ED2E8A17226091A700E44849 /* RemoteWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2E8A16226091A700E44849 /* RemoteWorker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,9 +23,11 @@
 		ED29AE6E2211BA020035C17A /* GKNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = GKNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED29AE712211BA020035C17A /* GKNetwork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GKNetwork.h; sourceTree = "<group>"; };
 		ED29AE722211BA020035C17A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		ED29AE7B2211BA460035C17A /* UploadFileEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadFileEntity.swift; sourceTree = "<group>"; };
-		ED29AE7C2211BA460035C17A /* URLRequestFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLRequestFactory.swift; sourceTree = "<group>"; };
-		ED29AE7D2211BA470035C17A /* NetworkWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkWorker.swift; sourceTree = "<group>"; };
+		ED2E8A0E226090CD00E44849 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		ED2E8A102260912400E44849 /* RemoteFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteFactory.swift; sourceTree = "<group>"; };
+		ED2E8A122260914800E44849 /* RemoteUploadModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteUploadModel.swift; sourceTree = "<group>"; };
+		ED2E8A142260916F00E44849 /* RemoteMappable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMappable.swift; sourceTree = "<group>"; };
+		ED2E8A16226091A700E44849 /* RemoteWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteWorker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,9 +80,9 @@
 		ED29AE702211BA020035C17A /* GKNetwork */ = {
 			isa = PBXGroup;
 			children = (
-				ED29AE7A2211BA320035C17A /* SourceData */,
 				ED29AE712211BA020035C17A /* GKNetwork.h */,
 				ED29AE722211BA020035C17A /* Info.plist */,
+				ED29AE7A2211BA320035C17A /* SourceData */,
 			);
 			path = GKNetwork;
 			sourceTree = "<group>";
@@ -86,9 +90,11 @@
 		ED29AE7A2211BA320035C17A /* SourceData */ = {
 			isa = PBXGroup;
 			children = (
-				ED29AE7D2211BA470035C17A /* NetworkWorker.swift */,
-				ED29AE7B2211BA460035C17A /* UploadFileEntity.swift */,
-				ED29AE7C2211BA460035C17A /* URLRequestFactory.swift */,
+				ED2E8A0E226090CD00E44849 /* HTTPMethod.swift */,
+				ED2E8A102260912400E44849 /* RemoteFactory.swift */,
+				ED2E8A142260916F00E44849 /* RemoteMappable.swift */,
+				ED2E8A122260914800E44849 /* RemoteUploadModel.swift */,
+				ED2E8A16226091A700E44849 /* RemoteWorker.swift */,
 			);
 			path = SourceData;
 			sourceTree = "<group>";
@@ -138,7 +144,7 @@
 				TargetAttributes = {
 					ED29AE6D2211BA020035C17A = {
 						CreatedOnToolsVersion = 10.1;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
@@ -208,9 +214,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED29AE7F2211BA470035C17A /* URLRequestFactory.swift in Sources */,
-				ED29AE7E2211BA470035C17A /* UploadFileEntity.swift in Sources */,
-				ED29AE802211BA470035C17A /* NetworkWorker.swift in Sources */,
+				ED2E8A132260914800E44849 /* RemoteUploadModel.swift in Sources */,
+				ED2E8A17226091A700E44849 /* RemoteWorker.swift in Sources */,
+				ED2E8A0F226090CD00E44849 /* HTTPMethod.swift in Sources */,
+				ED2E8A152260916F00E44849 /* RemoteMappable.swift in Sources */,
+				ED2E8A112260912400E44849 /* RemoteFactory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,7 +370,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -389,7 +397,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.gknetwork.lib;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

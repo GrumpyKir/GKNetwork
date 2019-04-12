@@ -1,24 +1,32 @@
 //
-//  NetworkWorker.swift
+//  RemoteWorker.swift
+//  GKNetwork
 //
-//  Created by  Кирилл on 21.08.2018.
-//  Copyright © 2018 AppCraft. All rights reserved.
+//  Created by  Кирилл on 4/12/19.
+//  Copyright © 2019 AppCraft. All rights reserved.
 //
 
-import Foundation
-import GKExtensions
+import UIKit
 
-public class NetworkWorker {
+public protocol RemoteWorkerInterface: AnyObject {
+    func execute<T: Codable>(_ request: URLRequest, model: T.Type, completion: @escaping (_ result: T?, _ response: HTTPURLResponse?, _ error: Error?) -> Void)
+    func cancel(_ request: URLRequest)
+}
+
+open class RemoteWorker: RemoteWorkerInterface {
     
+    // MARK: - Props
     private var activeTasks: [String: URLSessionDataTask]
     
+    // MARK: - Initialization
     public init() {
         self.activeTasks = [:]
     }
     
-    public func execute<T: Codable>(_ request: URLRequest, completion: @escaping (_ result: T?, _ response: URLResponse?, _ error: Error?) -> Void) {
+    // MARK: - RemoteWorkerInterface
+    public func execute<T: Codable>(_ request: URLRequest, model: T.Type, completion: @escaping (_ result: T?, _ response: HTTPURLResponse?, _ error: Error?) -> Void) {
         guard let taskAbsoluteString: String = request.url?.absoluteString else {
-            let invalidRequestError = NSError(domain: "[NetworkWorker] - Invalid request",
+            let invalidRequestError = NSError(domain: "[RemoteWorker] - Invalid request",
                                               code: 400,
                                               userInfo: nil)
             completion(nil, nil, invalidRequestError)
@@ -31,11 +39,11 @@ public class NetworkWorker {
         
         let newTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let receivedData = data, let receivedResponse = response as? HTTPURLResponse, error == nil {
-                print("[NetworkWorker] - Response: \(receivedResponse)")
+                NSLog("[RemoteWorker] - Response: \(receivedResponse)")
                 
                 switch receivedResponse.statusCode {
                 case 200:
-                    if let ok = String(data: receivedData, encoding: .utf8), ok.lowercased() == "ok" {
+                    if let okString = String(data: receivedData, encoding: .utf8), okString.lowercased() == "ok" {
                         self.activeTasks[taskAbsoluteString] = nil
                         completion(nil, receivedResponse, nil)
                         
@@ -44,7 +52,7 @@ public class NetworkWorker {
                     
                     do {
                         let jsonDecoder = JSONDecoder()
-                        let object = try jsonDecoder.decode(T.self, from: receivedData)
+                        let object = try jsonDecoder.decode(model, from: receivedData)
                         print("[NetworkWorker] - Data: \(object)")
                         
                         self.activeTasks[taskAbsoluteString] = nil
@@ -61,9 +69,9 @@ public class NetworkWorker {
                     completion(nil, receivedResponse, serverError)
                 }
             } else {
-                print("[NetworkWorker] - Error: \(error?.localizedDescription ?? "no error")")
+                NSLog("[RemoteWorker] - Error: \(error?.localizedDescription ?? "unknown error")")
                 if let receivedResponse = response as? HTTPURLResponse {
-                    print("[NetworkWorker] - Response: \(receivedResponse)")
+                    NSLog("[RemoteWorker] - Response: \(receivedResponse)")
                     self.activeTasks[taskAbsoluteString] = nil
                     completion(nil, receivedResponse, error)
                 } else {
@@ -71,7 +79,6 @@ public class NetworkWorker {
                     completion(nil, nil, error)
                 }
             }
-            
         }
         
         self.activeTasks[taskAbsoluteString] = newTask
@@ -86,4 +93,5 @@ public class NetworkWorker {
         }
     }
     
+    // MARK: - Module functions
 }
