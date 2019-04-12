@@ -6,6 +6,6 @@ target 'GKNetwork' do
   use_frameworks!
 
   # Pods for GKNetwork
-  pod 'GKExtensions', '~> 1.0.0'
+  pod 'GKExtensions', '~> 1.1.0'
 
 end
