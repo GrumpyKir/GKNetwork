@@ -8,8 +8,8 @@
 import UIKit
 
 public struct RemoteUploadModel {
-    var filename: String
-    var data: Data
+    public var filename: String
+    public var data: Data
     
     public init(filename: String, data: Data) {
         self.filename = filename

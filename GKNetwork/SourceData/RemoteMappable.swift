@@ -15,13 +15,13 @@ public protocol RemoteMappable {
 extension RemoteMappable {
     
     public func mapResponseToDomain() -> AnyObject {
-        NSLog("[\(self)] - Error: Response to domain mapper not implemented")
+        NSLog("[GKNetwork:RemoteMappable] - ERROR: \(self) response to domain mapper not implemented.")
         
         return self as AnyObject
     }
     
     public func mapResponseFromDomain(data: AnyObject) {
-        NSLog("[\(self)] - Error: Domain to response mapper not implemented")
+        NSLog("[GKNetwork:RemoteMappable] - ERROR: \(self) domain to response mapper not implemented.")
     }
     
 }
