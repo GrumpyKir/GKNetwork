@@ -18,7 +18,7 @@ public enum HTTPMethod: String {
     case trace   = "TRACE"
     case connect = "CONNECT"
     
-    var stringValue: String {
+    public var stringValue: String {
         return self.rawValue
     }
 }

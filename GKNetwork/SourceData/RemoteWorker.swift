@@ -13,33 +13,51 @@ public protocol RemoteWorkerInterface: AnyObject {
     func cancel(_ request: URLRequest)
 }
 
-open class RemoteWorker: RemoteWorkerInterface {
+open class RemoteWorker: NSObject, RemoteWorkerInterface {
     
     // MARK: - Props
+    private weak var sessionDelegate: URLSessionDelegate?
     private var activeTasks: [String: URLSessionDataTask]
+    private var urlSession: URLSession?
+    private var isLoggingEnabled: Bool
     
     // MARK: - Initialization
-    public init() {
+    public init(sessionConfiguration: URLSessionConfiguration? = nil, isLoggingEnabled: Bool = RemoteConfiguration.shared.isLoggingEnabled, sessionDelegate: URLSessionDelegate? = nil) {
         self.activeTasks = [:]
+        self.isLoggingEnabled = isLoggingEnabled
+        self.sessionDelegate = sessionDelegate
+        
+        super.init()
+        
+        if let sessionConfiguration = sessionConfiguration {
+            self.urlSession = URLSession(configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
+        } else {
+            self.urlSession = URLSession(configuration: RemoteConfiguration.shared.sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
+        }
     }
     
     // MARK: - RemoteWorkerInterface
     public func execute<T: Codable>(_ request: URLRequest, model: T.Type, completion: @escaping (_ result: T?, _ response: HTTPURLResponse?, _ error: Error?) -> Void) {
         guard let taskAbsoluteString: String = request.url?.absoluteString else {
-            let invalidRequestError = NSError(domain: "[RemoteWorker] - Invalid request",
-                                              code: 400,
-                                              userInfo: nil)
+            let invalidRequestError = NSError(domain: "Invalid request", code: 999, userInfo: nil)
             completion(nil, nil, invalidRequestError)
             
             return
         }
         if self.activeTasks[taskAbsoluteString] != nil {
+            if self.isLoggingEnabled {
+                NSLog("[GKNetwork:RemoteWorker] - WARNING: Same task < \(request.url?.absoluteString ?? "UNKNOWN") > canceled")
+            }
             self.activeTasks[taskAbsoluteString]?.cancel()
         }
         
-        let newTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+        let newTask = self.urlSession?.dataTask(with: request, completionHandler: { (data, response, error) in
             if let receivedData = data, let receivedResponse = response as? HTTPURLResponse, error == nil {
-                NSLog("[RemoteWorker] - Response: \(receivedResponse)")
+                if self.isLoggingEnabled {
+                    NSLog("[GKNetwork:RemoteWorker] - STATUS CODE: \(receivedResponse.statusCode)")
+                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADER:\n\(receivedResponse.allHeaderFields)")
+                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA:\n\(String(data: receivedData, encoding: .utf8) ?? "UNKNOWN")")
+                }
                 
                 switch receivedResponse.statusCode {
                 case 200:
@@ -53,11 +71,14 @@ open class RemoteWorker: RemoteWorkerInterface {
                     do {
                         let jsonDecoder = JSONDecoder()
                         let object = try jsonDecoder.decode(model, from: receivedData)
-                        print("[NetworkWorker] - Data: \(object)")
                         
                         self.activeTasks[taskAbsoluteString] = nil
                         completion(object, receivedResponse, nil)
                     } catch let parsingError {
+                        if self.isLoggingEnabled {
+                            NSLog("[GKNetwork:RemoteWorker] - ERROR: Parsing error \(parsingError.localizedDescription)")
+                        }
+                        
                         self.activeTasks[taskAbsoluteString] = nil
                         completion(nil, receivedResponse, parsingError)
                     }
@@ -69,17 +90,28 @@ open class RemoteWorker: RemoteWorkerInterface {
                     completion(nil, receivedResponse, serverError)
                 }
             } else {
-                NSLog("[RemoteWorker] - Error: \(error?.localizedDescription ?? "unknown error")")
                 if let receivedResponse = response as? HTTPURLResponse {
-                    NSLog("[RemoteWorker] - Response: \(receivedResponse)")
+                    if self.isLoggingEnabled {
+                        NSLog("[GKNetwork:RemoteWorker] - STATUS CODE: \(receivedResponse.statusCode)")
+                        NSLog("[GKNetwork:RemoteWorker] - ERROR: Session error")
+                        NSLog("[GKNetwork:RemoteWorker] - ERROR CODE: \((error as NSError?)?.code ?? -1)")
+                        NSLog("[GKNetwork:RemoteWorker] - ERROR DESCRIPTION: \((error as NSError?)?.description ?? "UNKNOWN")")
+                    }
+                    
                     self.activeTasks[taskAbsoluteString] = nil
                     completion(nil, receivedResponse, error)
                 } else {
+                    if self.isLoggingEnabled {
+                        NSLog("[GKNetwork:RemoteWorker] - ERROR: Internal error")
+                        NSLog("[GKNetwork:RemoteWorker] - ERROR CODE: \((error as NSError?)?.code ?? -1)")
+                        NSLog("[GKNetwork:RemoteWorker] - ERROR DESCRIPTION: \((error as NSError?)?.description ?? "UNKNOWN")")
+                    }
+                    
                     self.activeTasks[taskAbsoluteString] = nil
                     completion(nil, nil, error)
                 }
             }
-        }
+        })
         
         self.activeTasks[taskAbsoluteString] = newTask
         self.activeTasks[taskAbsoluteString]?.resume()
@@ -89,6 +121,9 @@ open class RemoteWorker: RemoteWorkerInterface {
         guard let taskAbsoluteString: String = request.url?.absoluteString else { return }
         
         if self.activeTasks[taskAbsoluteString] != nil {
+            if self.isLoggingEnabled {
+                NSLog("[GKNetwork:RemoteWorker] - WARNING: Task < \(request.url?.absoluteString ?? "UNKNOWN") > canceled")
+            }
             self.activeTasks[taskAbsoluteString]?.cancel()
         }
     }

@@ -1,0 +1,16 @@
+PODS:
+  - GKExtensions (1.1.0)
+
+DEPENDENCIES:
+  - GKExtensions (~> 1.1.0)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - GKExtensions
+
+SPEC CHECKSUMS:
+  GKExtensions: e2336b4ae2a62bfc968fd1a4ced30365ffb3f73b
+
+PODFILE CHECKSUM: 20c4957df65090f7cbe9d3860cf3545bf8c14370
+
+COCOAPODS: 1.6.1

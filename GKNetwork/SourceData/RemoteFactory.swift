@@ -10,25 +10,15 @@ import GKExtensions
 public enum RemoteFactory {
     
     // MARK: - Public methods
-    public static func request(path: String, parameters: [String: Any]?, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
-        switch method {
-        case .get,
-             .head:
-            return self.createRequestWithUrlParameters(path: path, parameters: parameters, headers: headers, method: method.stringValue)
-        case .post,
-             .put,
-             .patch,
-             .delete:
-            return self.createRequestWithBodyParameters(path: path, parameters: parameters, headers: headers, method: method.stringValue)
-        default:
-            // TODO: Add support to other http methods
-            break
-        }
-        
-        return nil
+    public static func request(path: String, parameters: [String: Any]?, headers: [String: String]?, method: HTTPMethod, bodyType: RequestBodyType = .json) -> URLRequest? {
+        return self.createRequest(path: path, parameters: parameters, headers: headers, method: method, bodyType: bodyType)
     }
     
-    public static func upload(path: String, fileKey: String, files: [RemoteUploadModel], parameters: [String: String]?, headers: [String: String]?) -> URLRequest? {
+    public static func request(path: String, parameters: [Any]?, headers: [String: String]?, method: HTTPMethod, bodyType: RequestBodyType = .json) -> URLRequest? {
+        return self.createRequest(path: path, parameters: parameters, headers: headers, method: method, bodyType: bodyType)
+    }
+    
+    public static func upload(path: String, fileKey: String, files: [RemoteUploadModel], parameters: [String: Any]?, headers: [String: String]?) -> URLRequest? {
         let urlString = path
         guard let url = URL(string: urlString) else { return nil }
         
@@ -43,16 +33,38 @@ public enum RemoteFactory {
         
         let boundary = self.generateBoundaryString()
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.httpBody = self.generateBody(with: parameters, fileKey: fileKey, files: files, boundary: boundary)
+        request.httpBody = self.generateFormDataBody(boundary: boundary, parameters: parameters, fileKey: fileKey, files: files)
         
         return request
     }
     
     // MARK: - Private methods
-    private static func createRequestWithUrlParameters(path: String, parameters: [String: Any]?, headers: [String: String]?, method: String) -> URLRequest? {
+    public static func createRequest(path: String, parameters: Any?, headers: [String: String]?, method: HTTPMethod, bodyType: RequestBodyType) -> URLRequest? {
+        switch method {
+        case .get,
+             .head:
+            return self.createRequestWithUrlParameters(path: path, parameters: parameters, headers: headers, method: method)
+        case .post,
+             .put,
+             .patch,
+             .delete:
+            return self.createRequestWithBodyParameters(path: path, parameters: parameters, headers: headers, method: method, bodyType: bodyType)
+        case .options,
+             .trace,
+             .connect:
+            // TODO: Add support to other http methods
+            NSLog("[GKNetwork:RemoteFactory] - ERROR: method \(method.stringValue) is not supporting now.")
+        }
+        
+        return nil
+    }
+    
+    private static func createRequestWithUrlParameters(path: String, parameters: Any?, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
         var parameterString = ""
-        if let parameters = parameters {
+        if let parameters = parameters as? [String: Any] {
             parameterString = self.generateUrlString(with: parameters)
+        } else {
+            NSLog("[GKNetwork:RemoteFactory] - ERROR: parameters are not a dictionary, please check the type of passed parameters.")
         }
         
         var urlString = path
@@ -62,7 +74,7 @@ public enum RemoteFactory {
         
         guard let url = URL(string: urlString) else { return nil }
         var request = URLRequest(url: url)
-        request.httpMethod = method
+        request.httpMethod = method.stringValue
         
         if let headers = headers {
             for header in headers {
@@ -73,20 +85,33 @@ public enum RemoteFactory {
         return request
     }
     
-    private static func createRequestWithBodyParameters(path: String, parameters: [String: Any]?, headers: [String: String]?, method: String) -> URLRequest? {
+    private static func createRequestWithBodyParameters(path: String, parameters: Any?, headers: [String: String]?, method: HTTPMethod, bodyType: RequestBodyType) -> URLRequest? {
         let urlString = path
         guard let url = URL(string: urlString) else { return nil }
         
         var request = URLRequest(url: url)
-        request.httpMethod = method
+        request.httpMethod = method.stringValue
         
-        var jsonData: Data?
-        if let parameters = parameters {
-            jsonData = try? JSONSerialization.data(withJSONObject: parameters, options: [])
+        switch bodyType {
+        case .json:
+            var jsonData: Data?
+            if let parameters = parameters {
+                jsonData = try? JSONSerialization.data(withJSONObject: parameters, options: [])
+            }
+            request.httpBody = jsonData
+            
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        case .formData:
+            let boundary = self.generateBoundaryString()
+            
+            if let parameters = parameters as? [String: Any] {
+                request.httpBody = self.generateFormDataBody(boundary: boundary, parameters: parameters)
+            } else {
+                NSLog("[GKNetwork:RemoteFactory] - ERROR: parameters are not a dictionary, please check the type of passed parameters.")
+            }
+            
+            request.setValue("application/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         }
-        request.httpBody = jsonData
-        
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         if let headers = headers {
             for header in headers {
@@ -135,10 +160,10 @@ public enum RemoteFactory {
     }
     
     private static func generateBoundaryString() -> String {
-        return "Boundary-\(NSUUID().uuidString)"
+        return "Boundary-\(UUID().uuidString)"
     }
     
-    private static func generateBody(with parameters: [String: String]?, fileKey: String, files: [RemoteUploadModel], boundary: String) -> Data {
+    private static func generateFormDataBody(boundary: String, parameters: [String: Any]?, fileKey: String = "", files: [RemoteUploadModel] = []) -> Data {
         var body = Data()
         
         if let parameters = parameters {
