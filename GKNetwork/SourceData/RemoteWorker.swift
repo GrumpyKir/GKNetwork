@@ -16,15 +16,16 @@ public protocol RemoteWorkerInterface: AnyObject {
 open class RemoteWorker: NSObject, RemoteWorkerInterface {
     
     // MARK: - Props
+    public var isLoggingEnabled: Bool
+    
     private weak var sessionDelegate: URLSessionDelegate?
     private var activeTasks: [String: URLSessionDataTask]
     private var urlSession: URLSession?
-    private var isLoggingEnabled: Bool
     
     // MARK: - Initialization
-    public init(sessionConfiguration: URLSessionConfiguration? = nil, isLoggingEnabled: Bool = RemoteConfiguration.shared.isLoggingEnabled, sessionDelegate: URLSessionDelegate? = nil) {
+    public init(sessionConfiguration: URLSessionConfiguration? = nil, sessionDelegate: URLSessionDelegate? = nil) {
         self.activeTasks = [:]
-        self.isLoggingEnabled = isLoggingEnabled
+        self.isLoggingEnabled = RemoteConfiguration.shared.isLoggingEnabled
         self.sessionDelegate = sessionDelegate
         
         super.init()
@@ -54,9 +55,19 @@ open class RemoteWorker: NSObject, RemoteWorkerInterface {
         let newTask = self.urlSession?.dataTask(with: request, completionHandler: { (data, response, error) in
             if let receivedData = data, let receivedResponse = response as? HTTPURLResponse, error == nil {
                 if self.isLoggingEnabled {
-                    NSLog("[GKNetwork:RemoteWorker] - STATUS CODE: \(receivedResponse.statusCode)")
-                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADER:\n\(receivedResponse.allHeaderFields)")
-                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA:\n\(String(data: receivedData, encoding: .utf8) ?? "UNKNOWN")")
+                    NSLog("[GKNetwork:RemoteWorker] - REQUEST URL: \(request.url?.absoluteString ?? "UNKNOWN")")
+                    if let requestHeaders = request.allHTTPHeaderFields {
+                        NSLog("[GKNetwork:RemoteWorker] - REQUEST HEADERS: \(requestHeaders)")
+                    }
+                    if let requestBody = request.httpBody, let requestBodyString = String(data: requestBody, encoding: .utf8) {
+                        NSLog("[GKNetwork:RemoteWorker] - REQUEST BODY: \(requestBodyString)")
+                    }
+                    
+                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE CODE: \(receivedResponse.statusCode)")
+                    if let responseHeaders = receivedResponse.allHeaderFields as? [String: Any] {
+                        NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADERS: \(responseHeaders)")
+                    }
+                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA: \(String(data: receivedData, encoding: .utf8) ?? "UNKNOWN")")
                 }
                 
                 switch receivedResponse.statusCode {
@@ -92,7 +103,11 @@ open class RemoteWorker: NSObject, RemoteWorkerInterface {
             } else {
                 if let receivedResponse = response as? HTTPURLResponse {
                     if self.isLoggingEnabled {
-                        NSLog("[GKNetwork:RemoteWorker] - STATUS CODE: \(receivedResponse.statusCode)")
+                        NSLog("[GKNetwork:RemoteWorker] - RESPONSE CODE: \(receivedResponse.statusCode)")
+                        if let responseHeaders = receivedResponse.allHeaderFields as? [String: Any] {
+                            NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADERS: \(responseHeaders)")
+                        }
+                        
                         NSLog("[GKNetwork:RemoteWorker] - ERROR: Session error")
                         NSLog("[GKNetwork:RemoteWorker] - ERROR CODE: \((error as NSError?)?.code ?? -1)")
                         NSLog("[GKNetwork:RemoteWorker] - ERROR DESCRIPTION: \((error as NSError?)?.description ?? "UNKNOWN")")
