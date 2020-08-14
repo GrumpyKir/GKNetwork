@@ -30,7 +30,7 @@ public enum RemoteFactory {
         return nil
     }
     
-    public static func request<T: Codable>(path: String, parameters: T, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
+    public static func request<T: Codable>(path: String, object: T, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
         switch method {
         case .get,
              .head:
@@ -46,7 +46,12 @@ public enum RemoteFactory {
             request.httpMethod = method.stringValue
             
             let jsonEncoder = JSONEncoder()
-            let jsonData = try? jsonEncoder.encode(parameters)
+            var jsonData: Data?
+            do {
+                jsonData = try jsonEncoder.encode(object)
+            } catch let error {
+                NSLog("[GKNetwork:RemoteFactory] - ERROR: could not serialize object, \(error.localizedDescription).")
+            }
             request.httpBody = jsonData
             
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -126,7 +131,7 @@ public enum RemoteFactory {
             if let parameters = parameters {
                 do {
                     jsonData = try JSONSerialization.data(withJSONObject: parameters, options: [])
-                } catch (let error) {
+                } catch let error {
                     NSLog("[GKNetwork:RemoteFactory] - ERROR: could not serialize dictionary, \(error.localizedDescription).")
                 }
             }
