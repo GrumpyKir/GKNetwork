@@ -9,6 +9,8 @@
 import UIKit
 
 public protocol RemoteWorkerInterface: AnyObject {
+    var isLoggingEnabled: Bool { get set }
+    
     func execute<T: Codable>(_ request: URLRequest, model: T.Type, completion: @escaping (_ result: T?, _ response: HTTPURLResponse?, _ error: Error?) -> Void)
     func cancel(_ request: URLRequest)
 }
