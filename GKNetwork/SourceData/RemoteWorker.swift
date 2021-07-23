@@ -59,7 +59,7 @@ open class RemoteWorker: NSObject, RemoteWorkerInterface {
                         NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADERS: \(responseHeaders)")
                     }
                 }
-                if let stringData = String(data: data, encoding: .utf8) {
+                if let recievedData = data, let stringData = String(data: recievedData, encoding: .utf8) {
                     NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA: \(stringData)")
                 } else {
                     NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA: UNKNOWN")
