@@ -41,7 +41,7 @@ open class RemoteWorker: NSObject, RemoteWorkerInterface {
     
     // MARK: - RemoteWorkerInterface
     public func execute(_ request: URLRequest, completion: @escaping (_ result: Data?, _ response: HTTPURLResponse?, _ error: Error?) -> Void) -> String {
-        let newTaskUid: String = UUID()
+        let newTaskUid: String = UUID().uuidString
         
         let newTask = self.urlSession?.dataTask(with: request, completionHandler: { data, response, error in
             if self.isLoggingEnabled {
@@ -53,11 +53,13 @@ open class RemoteWorker: NSObject, RemoteWorkerInterface {
                     NSLog("[GKNetwork:RemoteWorker] - REQUEST BODY: \(requestBodyString)")
                 }
                 
-                NSLog("[GKNetwork:RemoteWorker] - RESPONSE CODE: \(receivedResponse.statusCode)")
-                if let responseHeaders = receivedResponse.allHeaderFields as? [String: Any] {
-                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADERS: \(responseHeaders)")
+                if let httpResponse = response as? HTTPURLResponse {
+                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE CODE: \(httpResponse.statusCode)")
+                    if let responseHeaders = httpResponse.allHeaderFields as? [String: Any] {
+                        NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADERS: \(responseHeaders)")
+                    }
                 }
-                if let stringData = String(data: receivedData, encoding: .utf8) {
+                if let stringData = String(data: data, encoding: .utf8) {
                     NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA: \(stringData)")
                 } else {
                     NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA: UNKNOWN")
