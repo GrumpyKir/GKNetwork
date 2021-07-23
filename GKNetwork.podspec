@@ -5,7 +5,7 @@ s.ios.deployment_target = '10.0'
 s.name = "GKNetwork"
 s.summary = "Network layer"
 s.requires_arc = true
-s.version = "1.2.0"
+s.version = "1.2.1"
 s.license = { :type => "MIT", :file => "LICENSE" }
 s.author = { "Opekishev Kirill" => "grumpykir@gmail.com" }
 s.homepage = "https://github.com/GrumpyKir/GKNetwork"
