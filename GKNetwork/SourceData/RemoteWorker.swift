@@ -11,8 +11,8 @@ import UIKit
 public protocol RemoteWorkerInterface: AnyObject {
     var isLoggingEnabled: Bool { get set }
     
-    func execute<T: Codable>(_ request: URLRequest, model: T.Type, completion: @escaping (_ result: T?, _ response: HTTPURLResponse?, _ error: Error?) -> Void)
-    func cancel(_ request: URLRequest)
+    func execute(_ request: URLRequest, completion: @escaping (_ result: Data?, _ response: HTTPURLResponse?, _ error: Error?) -> Void) -> String
+    func cancel(_ taskUid: String)
 }
 
 open class RemoteWorker: NSObject, RemoteWorkerInterface {
