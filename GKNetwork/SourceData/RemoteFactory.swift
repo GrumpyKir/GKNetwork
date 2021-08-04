@@ -51,7 +51,7 @@ public enum RemoteFactory {
         return nil
     }
     
-    public static func request<T: Codable>(path: String, object: T, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
+    public static func request<RequestModel: Codable>(path: String, object: RequestModel, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
         switch method {
         case .get,
              .head:

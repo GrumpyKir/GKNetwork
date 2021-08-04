@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		100C708726BA7BCD0055676D /* RemoteLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100C708626BA7BCD0055676D /* RemoteLogger.swift */; };
 		3AEB079B67BE08253E8A6481 /* Pods_GKNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FA158919E0F3970586AEEDD /* Pods_GKNetwork.framework */; };
 		ED29AE732211BA020035C17A /* GKNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = ED29AE712211BA020035C17A /* GKNetwork.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED2E8A112260912400E44849 /* RemoteFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2E8A102260912400E44849 /* RemoteFactory.swift */; };
@@ -17,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		0CDCEDDEAE6A4C6DCECEE9E3 /* Pods-GKNetwork.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GKNetwork.release.xcconfig"; path = "Pods/Target Support Files/Pods-GKNetwork/Pods-GKNetwork.release.xcconfig"; sourceTree = "<group>"; };
+		100C708626BA7BCD0055676D /* RemoteLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLogger.swift; sourceTree = "<group>"; };
 		3067CE7214C65CD9310DD8C3 /* Pods-GKNetwork.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GKNetwork.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GKNetwork/Pods-GKNetwork.debug.xcconfig"; sourceTree = "<group>"; };
 		3FA158919E0F3970586AEEDD /* Pods_GKNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GKNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED29AE6E2211BA020035C17A /* GKNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = GKNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,6 +92,7 @@
 			children = (
 				EDF27E0C23C8811C00B4A82B /* RemoteConfiguration.swift */,
 				ED2E8A102260912400E44849 /* RemoteFactory.swift */,
+				100C708626BA7BCD0055676D /* RemoteLogger.swift */,
 				ED2E8A142260916F00E44849 /* RemoteMappable.swift */,
 				ED2E8A16226091A700E44849 /* RemoteWorker.swift */,
 			);
@@ -216,6 +219,7 @@
 				ED2E8A17226091A700E44849 /* RemoteWorker.swift in Sources */,
 				ED2E8A152260916F00E44849 /* RemoteMappable.swift in Sources */,
 				EDF27E0D23C8811C00B4A82B /* RemoteConfiguration.swift in Sources */,
+				100C708726BA7BCD0055676D /* RemoteLogger.swift in Sources */,
 				ED2E8A112260912400E44849 /* RemoteFactory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -365,7 +369,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gknetwork.lib;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -395,7 +399,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gknetwork.lib;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
