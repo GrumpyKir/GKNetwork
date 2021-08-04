@@ -7,40 +7,32 @@
 //
 
 import Foundation
-import UIKit
 
 public class RemoteConfiguration {
     
+    // MARK: - Singleton Property
     public static var shared: RemoteConfiguration = RemoteConfiguration()
     
-    public var sessionConfiguration: URLSessionConfiguration {
-        return self.sessionConfigurationValue
-    }
+    // MARK: - Props
+    public var sessionConfiguration: URLSessionConfiguration
+    public var loggerConfiguration: RemoteLoggerConfiguration
     
-    public var isLoggingEnabled: Bool {
-        #if DEBUG
-        return self.isLoggingEnabledValue
-        #else
-        return false
-        #endif
-    }
-    
-    private var sessionConfigurationValue: URLSessionConfiguration
-    private var isLoggingEnabledValue: Bool
-    
+    // MARK: - Initialization
     private init() {
-        self.sessionConfigurationValue = URLSessionConfiguration()
-        self.sessionConfigurationValue = .default
-        
-        self.isLoggingEnabledValue = false
+        self.sessionConfiguration = URLSessionConfiguration.default
+        self.loggerConfiguration = RemoteLoggerConfiguration()
     }
+}
+
+public class RemoteLoggerConfiguration {
     
-    public func setConfiguration(value: URLSessionConfiguration) {
-        self.sessionConfigurationValue = value
+    // MARK: - Props
+    public var isEnabled: Bool
+    public var maxEvents: Int
+    
+    // MARK: - Initialization
+    public init() {
+        self.isEnabled = false
+        self.maxEvents = 10
     }
-    
-    public func enableLogging(value: Bool) {
-        self.isLoggingEnabledValue = value
-    }
-    
 }

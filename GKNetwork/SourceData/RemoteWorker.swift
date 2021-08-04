@@ -6,68 +6,50 @@
 //  Copyright © 2019 AppCraft. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 public protocol RemoteWorkerInterface: AnyObject {
-    var isLoggingEnabled: Bool { get set }
+    var tasks: [String: URLSessionDataTask] { get }
     
-    func execute(_ request: URLRequest, completion: @escaping (_ result: Data?, _ response: HTTPURLResponse?, _ error: Error?) -> Void) -> String
+    func execute(_ request: URLRequest, completion: @escaping (_ result: RemoteWorkerResult) -> Void) -> String
     func cancel(_ taskUid: String)
 }
 
 open class RemoteWorker: NSObject, RemoteWorkerInterface {
     
-    // MARK: - Props
-    public var isLoggingEnabled: Bool
-    
-    private weak var sessionDelegate: URLSessionDelegate?
+    // MARK: - Private Props
     private var activeTasks: [String: URLSessionDataTask]
     private var urlSession: URLSession?
     
+    // MARK: - Delegate Props
+    private weak var urlSessionDelegate: URLSessionDelegate?
+    
     // MARK: - Initialization
-    public init(sessionConfiguration: URLSessionConfiguration? = nil, sessionDelegate: URLSessionDelegate? = nil) {
+    public init(sessionDelegate: URLSessionDelegate? = nil) {
         self.activeTasks = [:]
-        self.isLoggingEnabled = RemoteConfiguration.shared.isLoggingEnabled
-        self.sessionDelegate = sessionDelegate
         
         super.init()
         
-        if let sessionConfiguration = sessionConfiguration {
-            self.urlSession = URLSession(configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
-        } else {
-            self.urlSession = URLSession(configuration: RemoteConfiguration.shared.sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
-        }
+        self.urlSession = URLSession(configuration: RemoteConfiguration.shared.sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
+        self.urlSessionDelegate = sessionDelegate
     }
     
     // MARK: - RemoteWorkerInterface
-    public func execute(_ request: URLRequest, completion: @escaping (_ result: Data?, _ response: HTTPURLResponse?, _ error: Error?) -> Void) -> String {
+    public var tasks: [String: URLSessionDataTask] {
+        return self.activeTasks
+    }
+    
+    public func execute(_ request: URLRequest, completion: @escaping (_ result: RemoteWorkerResult) -> Void) -> String {
         let newTaskUid: String = UUID().uuidString
+        RemoteLogger.shared.logEvent(uid: newTaskUid)
         
         let newTask = self.urlSession?.dataTask(with: request, completionHandler: { data, response, error in
-            if self.isLoggingEnabled {
-                NSLog("[GKNetwork:RemoteWorker] - REQUEST URL: \(request.url?.absoluteString ?? "UNKNOWN")")
-                if let requestHeaders = request.allHTTPHeaderFields {
-                    NSLog("[GKNetwork:RemoteWorker] - REQUEST HEADERS: \(requestHeaders)")
-                }
-                if let requestBody = request.httpBody, let requestBodyString = String(data: requestBody, encoding: .utf8) {
-                    NSLog("[GKNetwork:RemoteWorker] - REQUEST BODY: \(requestBodyString)")
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse {
-                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE CODE: \(httpResponse.statusCode)")
-                    if let responseHeaders = httpResponse.allHeaderFields as? [String: Any] {
-                        NSLog("[GKNetwork:RemoteWorker] - RESPONSE HEADERS: \(responseHeaders)")
-                    }
-                }
-                if let recievedData = data, let stringData = String(data: recievedData, encoding: .utf8) {
-                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA: \(stringData)")
-                } else {
-                    NSLog("[GKNetwork:RemoteWorker] - RESPONSE DATA: UNKNOWN")
-                }
-            }
-            
             self.activeTasks[newTaskUid] = nil
-            completion(data, response as? HTTPURLResponse, error)
+            
+            let result = RemoteWorkerResult(data: data, response: response as? HTTPURLResponse, error: error)
+            RemoteLogger.shared.logEvent(uid: newTaskUid, result: result)
+            
+            completion(result)
         })
         
         self.activeTasks[newTaskUid] = newTask
@@ -78,13 +60,21 @@ open class RemoteWorker: NSObject, RemoteWorkerInterface {
     
     public func cancel(_ taskUid: String) {
         if self.activeTasks[taskUid] != nil {
-            if self.isLoggingEnabled {
-                NSLog("[GKNetwork:RemoteWorker] - WARNING: Task < \(taskUid) > canceled")
-            }
+            RemoteLogger.shared.logEvent(uid: taskUid, isCanceled: true)
             
             self.activeTasks[taskUid]?.cancel()
         }
     }
+}
+
+public class RemoteWorkerResult {
+    public var data: Data?
+    public var response: HTTPURLResponse?
+    public var error: Error?
     
-    // MARK: - Module functions
+    public init(data: Data?, response: HTTPURLResponse?, error: Error?) {
+        self.data = data
+        self.response = response
+        self.error = error
+    }
 }

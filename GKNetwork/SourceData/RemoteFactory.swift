@@ -7,6 +7,27 @@
 
 import GKExtensions
 
+public enum RequestBodyType {
+    case json
+    case formData
+}
+
+public enum HTTPMethod: String {
+    case options = "OPTIONS"
+    case get     = "GET"
+    case head    = "HEAD"
+    case post    = "POST"
+    case put     = "PUT"
+    case patch   = "PATCH"
+    case delete  = "DELETE"
+    case trace   = "TRACE"
+    case connect = "CONNECT"
+    
+    public var stringValue: String {
+        return self.rawValue
+    }
+}
+
 public enum RemoteFactory {
     
     // MARK: - Public methods
@@ -30,7 +51,7 @@ public enum RemoteFactory {
         return nil
     }
     
-    public static func request<T: Codable>(path: String, object: T, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
+    public static func request<RequestModel: Codable>(path: String, object: RequestModel, headers: [String: String]?, method: HTTPMethod) -> URLRequest? {
         switch method {
         case .get,
              .head:
@@ -225,4 +246,14 @@ public enum RemoteFactory {
         return body
     }
     
+}
+
+public struct RemoteUploadModel {
+    public var filename: String
+    public var data: Data
+    
+    public init(filename: String, data: Data) {
+        self.filename = filename
+        self.data = data
+    }
 }

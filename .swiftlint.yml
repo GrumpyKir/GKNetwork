@@ -14,6 +14,7 @@ opt_in_rules:
   - contains_over_first_not_nil
   - convenience_type
   - discouraged_object_literal
+  - discarded_notification_center_observer
   - empty_count
   - empty_string
   - explicit_enum_raw_value
@@ -25,7 +26,6 @@ opt_in_rules:
   - force_unwrapping
   - function_default_parameter_at_end
   - identical_operands
-  - implicit_return
   - joined_default_parameter
   - last_where
   - legacy_random
@@ -35,15 +35,13 @@ opt_in_rules:
   - overridden_super_call
   - pattern_matching_keywords
   - prefixed_toplevel_constant
-  - private_action #
-  - private_outlet #
+  - private_action
+  - private_outlet
   - prohibited_super_call
   - sorted_first_last
   - toggle_bool
   - unused_import
-  - unused_private_declaration
   - vertical_parameter_alignment_on_call
-  - vertical_whitespace_closing_braces
 disabled_rules:
   - multiple_closures_with_trailing_closure
   - nesting
@@ -51,6 +49,7 @@ disabled_rules:
   - private_unit_test
   - redundant_string_enum_value
   - trailing_whitespace
+  - vertical_whitespace
 anyobject_protocol: 
   severity: error
 attributes: 
@@ -62,7 +61,7 @@ class_delegate_protocol:
 closing_brace: 
   severity: warning
 closure_body_length:
-  warning: 20
+  warning: 30
   error: 100
 closure_end_indentation: 
   severity: warning
@@ -78,8 +77,6 @@ comma:
   severity: warning
 compiler_protocol_init:
   severity: error
-conditional_returns_on_newline:
-  severity: warning
 contains_over_first_not_nil:
   severity: error
 control_statement:
@@ -89,8 +86,8 @@ convenience_type:
 custom_rules:
   severity: warning
 cyclomatic_complexity:
-  warning: 20
-  error: 30
+  warning: 60
+  error: 100
 discarded_notification_center_observer:
   severity: error
 discouraged_direct_init:
@@ -118,7 +115,7 @@ explicit_self:
 fatal_error_message:
   severity: error
 file_length:
-  warning: 500
+  warning: 1000
   error: 1500
 file_name:
   severity: warning
@@ -152,12 +149,19 @@ identifier_name:
   excluded:
     - i
     - j
+    - x
+    - y
     - ad
     - db
     - id
+    - ip
+    - my
     - nc
     - ok
+    - os
     - to
+    - tv
+    - up
     - vc
     - vm
     - _input
@@ -170,8 +174,6 @@ identifier_name:
     - _view
     - _viewModel
 implicit_getter:
-  severity: warning
-implicit_return:
   severity: warning
 inert_defer:
   severity: error
@@ -199,36 +201,16 @@ legacy_random:
 let_var_whitespace:
   severity: warning
 line_length:
-  warning: 300
-  error: 500
+  warning: 500
+  error: 700
 literal_expression_end_indentation:
   severity: warning
-lower_acl_than_parent:
-  severity: error
 mark:
-  severity: error
-multiline_arguments:
   severity: warning
-multiline_arguments_brackets:
-  severity: warning
-multiline_function_chains:
-  severity: warning
-multiline_literal_brackets:
-  severity: warning
-multiline_parameters:
-  severity: warning
-multiline_parameters_brackets:
-  severity: warning
-nesting:
-  severity: error
-no_extension_access_modifier:
-  severity: error
 no_fallthrough_only:
   severity: error
 notification_center_detachment:
   severity: error
-number_separator:
-  severity: warning
 opening_brace:
   severity: warning
 operator_usage_whitespace:
@@ -257,8 +239,6 @@ redundant_optional_initialization:
   severity: warning
 redundant_set_access_control:
   severity: warning
-redundant_string_enum_value:
-  severity: warning
 redundant_void_return:
   severity: warning
 return_arrow_whitespace:
@@ -267,8 +247,6 @@ shorthand_operator:
   severity: warning
 sorted_first_last:
   severity: error
-sorted_imports:
-  severity: warning
 statement_position:
   severity: warning
 switch_case_alignment:
@@ -286,8 +264,8 @@ trailing_newline:
 trailing_semicolon:
   severity: warning
 type_body_length:
-  warning: 300
-  error: 400
+  warning: 500
+  error: 700
 type_name:
   severity: error
 unneeded_break_in_switch:
@@ -302,17 +280,11 @@ unused_import:
   severity: error
 unused_optional_binding:
   severity: error
-unused_private_declaration:
-  severity: error
 valid_ibinspectable:
   severity: error
 vertical_parameter_alignment:
   severity: warning
 vertical_parameter_alignment_on_call:
-  severity: warning
-vertical_whitespace:
-  severity: warning
-vertical_whitespace_closing_braces:
   severity: warning
 void_return:
   severity: warning
