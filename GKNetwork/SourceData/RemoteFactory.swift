@@ -7,6 +7,27 @@
 
 import GKExtensions
 
+public enum RequestBodyType {
+    case json
+    case formData
+}
+
+public enum HTTPMethod: String {
+    case options = "OPTIONS"
+    case get     = "GET"
+    case head    = "HEAD"
+    case post    = "POST"
+    case put     = "PUT"
+    case patch   = "PATCH"
+    case delete  = "DELETE"
+    case trace   = "TRACE"
+    case connect = "CONNECT"
+    
+    public var stringValue: String {
+        return self.rawValue
+    }
+}
+
 public enum RemoteFactory {
     
     // MARK: - Public methods
@@ -225,4 +246,14 @@ public enum RemoteFactory {
         return body
     }
     
+}
+
+public struct RemoteUploadModel {
+    public var filename: String
+    public var data: Data
+    
+    public init(filename: String, data: Data) {
+        self.filename = filename
+        self.data = data
+    }
 }
